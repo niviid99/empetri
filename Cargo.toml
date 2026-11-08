@@ -3,9 +3,12 @@ name = "empetri"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 anyhow = "1.0.104"
-eframe = "0.37.0"
+eframe = { version = "0.37.0", default-features = false, features = ["android-native-activity", "glow"] }
 egui = "0.37.0"
 log = "0.4.35"
 rodio = "0.23.0"
@@ -14,11 +17,32 @@ walkdir = "2.5.0"
 
 [profile.release]
 opt-level = 3
-lto = true
+lto = "thin"
 strip = true
 panic = "abort"
 codegen-units = 1
 
 [profile.dev]
 panic = "abort"
+
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger = "0.14" 
+android-activity = { version = "0.6", features = ["native-activity"] }
+
+[package.metadata.android]
+package = "com.niviid99.empetri"
+label = "Empetri"
+manifest = "AndroidManifest.xml"
+
+
+[package.metadata.android.sdk]
+min_sdk_version = 26       
+target_sdk_version = 34   
+
+
+[package.metadata.android.signing.release]
+path = "my-release-key.keystore"
+keystore_password = "eldrifto"
+key_alias = "empetri_alias"
+key_password = "eldrifto"
 

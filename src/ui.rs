@@ -2,6 +2,7 @@ use std::{path::PathBuf, time::Duration};
 
 use crate::{services, uistyles};
 use eframe::App;
+use egui::Direction::BottomUp;
 
 pub struct UI {
     first_frame: bool,
@@ -19,7 +20,9 @@ impl UI {
     pub fn new() -> Self {
         Self {
             first_frame: true,
-            filesystem_service: services::FileSystem::from_exec(),
+            filesystem_service: services::FileSystem::by_path_str(
+                "/data/data/com.niviid99.empetri/files/Music", // THIS IS FUCKIN SHIT!!!!!!!
+            ),
             workdir: String::new(),
             files_list: Vec::new(),
             audio_service: None,
@@ -77,8 +80,9 @@ impl UI {
     }
 
     fn central(&mut self, ui: &mut egui::Ui) {
-        egui::ScrollArea::vertical().show(ui, |ui| {
-            ui.vertical(|ui| {
+        egui::ScrollArea::vertical()
+            .auto_shrink([false; 2])
+            .show(ui, |ui| {
                 for file in self.files_list.iter() {
                     let selected: bool;
                     if let Some(now) = &self.now_playing {
@@ -112,7 +116,6 @@ impl UI {
                     }
                 }
             });
-        });
     }
 
     fn toolbar_bottom(&mut self, ui: &mut egui::Ui) {
@@ -140,6 +143,7 @@ impl UI {
             ui.checkbox(&mut self.repeat_track, "repeat");
             self.volume_controll(ui);
         });
+        ui.add_space(50.0);
     }
 
     fn track_controll(&mut self, ui: &mut egui::Ui) {
@@ -155,7 +159,7 @@ impl UI {
                     audio_service.set_pos(Duration::from_secs(self.track_cursor));
                 }
 
-                if self.track_cursor >= dursec - 2 {
+                if self.track_cursor >= dursec - 5 {
                     if !self.repeat_track {
                         audio_service.stop();
                         self.now_playing = None;
@@ -180,13 +184,13 @@ impl UI {
     }
 
     fn toolbar_top(&mut self, ui: &mut egui::Ui) {
-        ui.horizontal(|ui| {
-            ui.text_edit_singleline(&mut self.workdir);
-            if ui.button("refresh").clicked() {
-                self.filesystem_service.change_path_str(&self.workdir);
-                self.refresh_files_list();
-            }
-        });
+        ui.add_space(50.0);
+        ui.text_edit_singleline(&mut self.workdir);
+        if ui.button("refresh").clicked() {
+            self.filesystem_service.change_path_str(&self.workdir);
+            self.refresh_files_list();
+            ui.request_repaint();
+        }
     }
 
     fn refresh_files_list(&mut self) {

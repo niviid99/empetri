@@ -2,3 +2,7 @@
 rustflags = [
   "-C", "link-arg=-fuse-ld=mold"
 ]
+
+
+[target.aarch64-linux-android]
+rustflags = ["-C", "link-arg=--target=aarch64-linux-android26"]

@@ -75,6 +75,10 @@ pub struct FileSystem {
 }
 
 impl FileSystem {
+    pub fn by_path_str(path: &str) -> Self {
+        let workdir = PathBuf::from(path);
+        Self { workdir }
+    }
     pub fn from_exec() -> Self {
         let current_path = std::env::current_dir().unwrap_or(PathBuf::from("/"));
         Self {
@@ -107,13 +111,19 @@ impl FileSystem {
             .map(|e| e.path().to_string_lossy().to_string())
             .filter(|x| {
                 for pattern in filter.iter() {
-                    if x.ends_with(*pattern) {
+                    if x.to_lowercase().ends_with(&pattern.to_lowercase()) {
                         return true;
                     }
                 }
                 false
             })
             .collect();
+
+        log::info!(
+            "files_list len = {}, first file = {:?}",
+            sfl.len(),
+            sfl.first()
+        );
 
         Ok(())
     }
