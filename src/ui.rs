@@ -37,6 +37,8 @@ impl App for UI {
             self.first_frame = false;
             uistyles::custom(ui);
             log::info!("Setted up custom ui style");
+            uistyles::customfont(ui);
+            log::info!("Setted up custom font");
 
             self.ff();
             log::info!(
@@ -161,8 +163,14 @@ impl UI {
                         self.now_playing = None;
                         self.track_cursor = 0;
                     } else {
-                        audio_service.set_pos(Duration::from_secs(0));
+                        audio_service.stop();
                         self.track_cursor = 0;
+
+                        if let Some(np) = &self.now_playing {
+                            if audio_service.load(np).is_ok() {
+                                audio_service.play();
+                            }
+                        }
                     }
                 }
             }
