@@ -1,5 +1,5 @@
 pub fn custom(ui: &mut egui::Ui) {
-    let mut vconf = egui::Visuals::dark();
+    let mut vconf = egui::Visuals::light();
 
     vconf.widgets.noninteractive.corner_radius = egui::CornerRadius::ZERO;
     vconf.widgets.inactive.corner_radius = egui::CornerRadius::ZERO;
